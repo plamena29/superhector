@@ -35,7 +35,7 @@ public class CatalogoServicesSQLite implements CatalogoServices {
 
     @Override
     public boolean deleteArticuloEnCatalogo(int codigoArticulo) {
-        return false;
+        return myDB.deleteArticuloEnCatalogo(codigoArticulo);
     }
 
     @Override
@@ -44,8 +44,13 @@ public class CatalogoServicesSQLite implements CatalogoServices {
     }
 
     @Override
+    public List<Articulo> getAllCatalogo() {
+        return myDB.getAllCatalogo();
+    }
+
+    @Override
     public List<Articulo> getAllCatalogoPorTipo(Tipo tipo) {
-        return null;
+        return myDB.getAllCatalogoPorTipo(tipo);
     }
 
     @Override

@@ -12,7 +12,12 @@ import com.canplimplam.superhector.modelo.Tipo;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -134,7 +139,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean deleteArticuloEnCatalogo(int codigoArticulo){
-        return false;
+        long resultado = db.delete(CATALOGO_TABLE, COL_1 + " = " + codigoArticulo, null);
+        return resultado <= 0 ? false: true;
     }
 
     //Devuelve el id de producto buscando por el nombre.
@@ -156,5 +162,62 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
         return resultado;
+    }
+
+    public List<Articulo> getAllCatalogo(){
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + CATALOGO_TABLE, null);
+
+        List<Articulo> articulos = new ArrayList<Articulo>();
+        Map<String,Articulo> catalogo = new TreeMap<String,Articulo>();
+
+        if(cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+
+                int codigo = cursor.getInt(0);
+                String nombre = cursor.getString(1);
+                int puntos = cursor.getInt(2);
+                Tipo tipo = Tipo.valueOf(cursor.getString(3));
+
+                Articulo articulo = new Articulo(codigo, nombre, puntos, tipo);
+                catalogo.put(nombre,articulo);
+            }
+        }
+
+        Set<String> llaves = catalogo.keySet();
+        for(String llave: llaves){
+            Articulo a = catalogo.get(llave);
+            articulos.add(a);
+        }
+        return articulos;
+    }
+
+    public List<Articulo> getAllCatalogoPorTipo(Tipo tipo){
+
+        String[] campos = new String[]{COL_1, COL_2, COL_3, COL_4};
+
+        Cursor cursor = db.query(CATALOGO_TABLE, campos, COL_4 + " LIKE ?", new String[]{"%" + tipo.toString() + "%"},null, null, null);
+
+        List<Articulo> articulos = new ArrayList<Articulo>();
+        Map<String,Articulo> catalogo = new TreeMap<String,Articulo>();
+
+        if(cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+
+                int codigo = cursor.getInt(0);
+                String nombre = cursor.getString(1);
+                int puntos = cursor.getInt(2);
+
+                Articulo articulo = new Articulo(codigo, nombre, puntos, tipo);
+                catalogo.put(nombre,articulo);
+            }
+        }
+
+        Set<String> llaves = catalogo.keySet();
+        for(String llave: llaves){
+            Articulo a = catalogo.get(llave);
+            articulos.add(a);
+        }
+        return articulos;
     }
 }

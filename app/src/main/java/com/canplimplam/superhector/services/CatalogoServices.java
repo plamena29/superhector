@@ -15,6 +15,7 @@ public interface CatalogoServices {
     public int validarArticuloPorNombre(String nombreArticulo);
 
     //Filtros
+    public List<Articulo> getAllCatalogo();
     public List<Articulo> getAllCatalogoPorTipo(Tipo tipo);
     public List<Articulo> getByTextCatalogo(String texto, Tipo tipo);
 

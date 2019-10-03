@@ -2,12 +2,17 @@ package com.canplimplam.superhector.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.canplimplam.superhector.modelo.Articulo;
+import com.canplimplam.superhector.modelo.Tipo;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -54,7 +59,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //GESTOR PARA EL CATALOGO
 
-    public Articulo crearArticuloEnDespensa(Articulo articulo){
+    public Articulo createArticuloEnCatalogo(Articulo articulo){
 
         //Montamos contentValues
         ContentValues contentValues = new ContentValues();
@@ -68,7 +73,88 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         articulo.setCodigo((int) resultado);
 
+        Log.d("**", articulo.toString());
         return resultado == -1 ? null: articulo;
     }
 
+    public Articulo readArticuloEnCatalogo(int codigoArticulo){
+
+        Articulo articulo = new Articulo();
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT " + COL_1 + ", ")
+                .append(COL_2 + ", ")
+                .append(COL_3 + ", ")
+                .append(COL_4)
+                .append(" FROM ")
+                .append(CATALOGO_TABLE)
+                .append(" WHERE ")
+                .append(COL_1 + " = " + codigoArticulo);
+
+        Cursor cursor = db.rawQuery(sb.toString(), null);
+        if(cursor != null && cursor.getCount() > 0){
+            while (cursor.moveToNext()) {
+
+                String nombre = cursor.getString(1);
+                int puntos = cursor.getInt(2);
+                Tipo tipo = Tipo.valueOf(cursor.getString(3));
+
+                articulo.setCodigo(codigoArticulo);
+                articulo.setNombre(nombre);
+                articulo.setPuntos(puntos);
+                articulo.setTipo(tipo);
+            }
+        }
+        return articulo;
+    }
+
+    public Articulo updateArticuloEnCatalogo(Articulo articulo){
+        int codigo = articulo.getCodigo();
+        int nombreExistente = validarArticuloPorNombre(articulo.getNombre());
+
+        //El articulo no existe y hay que crearlo:
+        //1 - se crea nuevo en catalogo desde el Formulario
+        if((codigo == -1) && (nombreExistente == -1)){
+            Articulo articuloCreado = createArticuloEnCatalogo(articulo);
+            return articuloCreado;
+        }
+        //Se conoce el código del articulo
+        // 1- es una actualizacion desde el catalogo
+        else if(codigo != -1){
+            //Montamos contentValues
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COL_3, articulo.getPuntos());
+
+            long resultado = db.update(CATALOGO_TABLE, contentValues, COL_1 + " = " + articulo.getCodigo(), null);
+
+            Articulo articuloActualizado = readArticuloEnCatalogo(articulo.getCodigo());
+            return articuloActualizado;
+        }else{
+            return articulo;
+        }
+    }
+
+    public boolean deleteArticuloEnCatalogo(int codigoArticulo){
+        return false;
+    }
+
+    //Devuelve el id de producto buscando por el nombre.
+    //Si no existe, devuelve -1
+    public int validarArticuloPorNombre(String nombreArticulo){
+        int resultado = -1;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT " + COL_1 + ", " + COL_2)
+                .append(" FROM ")
+                .append(CATALOGO_TABLE)
+                .append(" WHERE ")
+                .append(COL_2 + " = '" + nombreArticulo + "'");
+
+        Cursor cursor = db.rawQuery(sb.toString(), null);
+        if(cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                resultado = cursor.getInt(0);
+            }
+        }
+        return resultado;
+    }
 }

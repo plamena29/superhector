@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), NuevoArticuloActivity.class);
-                Log.d("**", "despues de intent");
                 startActivity(intent);
             }
         });
@@ -38,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), CatalogoActivity.class);
-                Log.d("**", "despues de intent");
                 startActivity(intent);
             }
         });

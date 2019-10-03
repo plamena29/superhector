@@ -5,7 +5,7 @@ import com.canplimplam.superhector.modelo.Tipo;
 
 import java.util.List;
 
-public interface CatalogoService {
+public interface CatalogoServices {
 
     //CRUD
     public Articulo createArticuloEnCatalogo(Articulo articulo);

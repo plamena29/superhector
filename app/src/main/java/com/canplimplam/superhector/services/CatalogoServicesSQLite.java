@@ -54,7 +54,7 @@ public class CatalogoServicesSQLite implements CatalogoServices {
     }
 
     @Override
-    public List<Articulo> getByTextCatalogo(String texto, Tipo tipo) {
-        return null;
+    public List<Articulo> getByTextCatalogo(String texto) {
+        return myDB.getByTextCatalogo(texto);
     }
 }

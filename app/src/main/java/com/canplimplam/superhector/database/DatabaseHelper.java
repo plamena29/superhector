@@ -220,4 +220,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return articulos;
     }
+
+    public List<Articulo> getByTextCatalogo(String texto){
+        String[] campos = new String[]{COL_1, COL_2, COL_3, COL_4};
+
+        Cursor cursor = db.query(CATALOGO_TABLE, campos, COL_2 + " LIKE ?", new String[]{"%" + texto + "%"},null, null, null);
+
+        List<Articulo> articulos = new ArrayList<Articulo>();
+        Map<String,Articulo> catalogo = new TreeMap<String,Articulo>();
+
+        if(cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+
+                int codigo = cursor.getInt(0);
+                String nombre = cursor.getString(1);
+                int puntos = cursor.getInt(2);
+                Tipo tipo = Tipo.valueOf(cursor.getString(3));
+
+                Articulo articulo = new Articulo(codigo, nombre, puntos, tipo);
+                catalogo.put(nombre,articulo);
+            }
+        }
+
+        Set<String> llaves = catalogo.keySet();
+        for(String llave: llaves){
+            Articulo a = catalogo.get(llave);
+            articulos.add(a);
+        }
+        return articulos;
+    }
 }
